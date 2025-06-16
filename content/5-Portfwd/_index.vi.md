@@ -19,7 +19,7 @@ Chúng ta sẽ cấu hình **Code Pipeline** để tự động hóa quá trình
   - Nhập tên pipeline, mình sẽ chọn tạo role mới luôn rồi chọn next
   ![cluster](/images/Codepl/4.png)
   - Tới phần Source mình chọn github -> chọn connection -> tên repo -> nhánh. Chọn Webhook để có thể trigger pipeline thông qua lệnh push
-  {{% notice info %}}Nếu bạn chưa thiết lập kết nối thì có thể tham khảo [đây](URL "https://docs.aws.amazon.com/dtconsole/latest/userguide/connections-create-github.html#connections-create-github-console"){{% /notice %}}
+  {{% notice info %}}Nếu bạn chưa thiết lập kết nối thì có thể tham khảo [đây](https://docs.aws.amazon.com/dtconsole/latest/userguide/connections-create-github.html#connections-create-github-console){{% /notice %}}
   ![cluster](/images/Codepl/5.png)
   - Tới phần build mình chọn Other build providers -> AWS Codebuild -> chọn project đã tạo ở trang 3 và next
   ![cluster](/images/Codepl/6.png)

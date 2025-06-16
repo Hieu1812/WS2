@@ -20,7 +20,7 @@ We will configure **Code Pipeline** to automate the container deployment process
   - Enter pipeline name, we'll create a new role and select next
   ![cluster](/images/Codepl/4.png)
   - For the Source, select github -> choose connection -> repository name -> branch. Select Webhook to trigger pipeline through push command
-  {{% notice info %}}If you haven't set up the connection yet, you can refer to [here](URL "https://docs.aws.amazon.com/dtconsole/latest/userguide/connections-create-github.html#connections-create-github-console"){{% /notice %}}
+  {{% notice info %}}If you haven't set up the connection yet, you can refer to [here](https://docs.aws.amazon.com/dtconsole/latest/userguide/connections-create-github.html#connections-create-github-console){{% /notice %}}
   ![cluster](/images/Codepl/5.png)
   - For the build section, select Other build providers -> AWS Codebuild -> select the project created on page 3 and next
   ![cluster](/images/Codepl/6.png)

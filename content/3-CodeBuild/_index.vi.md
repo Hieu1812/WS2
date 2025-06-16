@@ -9,7 +9,7 @@ pre = "<b>3. </b>"
 Phần này, bạn sẽ thiết lập Codebuild để khởi chạy dockerfile và lưu trữ chúng trên ECR
 
 {{% notice info %}}
-Bạn sẽ cần phải bổ sung thêm buildspec.yaml để codebuild hoạt động theo ý muốn.  [File buildspec tham khảo](URL "https://github.com/Hieu1812/book-server/blob/main/buildspec.yml")
+Bạn sẽ cần phải bổ sung thêm buildspec.yaml để codebuild hoạt động theo ý muốn.  [File buildspec tham khảo](https://github.com/Hieu1812/book-server/blob/main/buildspec.yml)
 {{% /notice %}}
 
 ### Tạo Codebuild
