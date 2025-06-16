@@ -1,0 +1,85 @@
+[
+{
+	"uri": "//localhost:1313/",
+	"title": "Developing CI/CD for Backend using Docker with AWS Services",
+	"tags": [],
+	"description": "",
+	"content": "Developing CI/CD for Backend using Docker with AWS Services Overview In this lab, you will learn about AWS services in implementing CI/CD pipeline.\nECR A docker image registry service provided by Amazon Web Services (AWS). Using ECR can integrate with other services like ECS, EKS, etc. more conveniently with high availability. CodePipeline An AWS service that helps us build pipeline flow for CI/CD. In this article, there will be 3 stages: Source, Build, Deploy. Source will be triggered via push command in the configured github repo. Build will trigger CodeBuild, Deploy will trigger CodeDeploy. CodeBuild CodeBuild will perform the role of building source code so that the application can be ready to deploy. It will execute build commands through a yaml config file containing all build commands and related configurations. ECS A fully managed container orchestration service that will help deploy, manage and scale packaged applications more efficiently. In this article, we will use the serverless structure Fargate. ALB Application Load Balancer is load balancing at the application layer (Layer 7 - HTTP). Helps coordinate HTTP Requests to different service servers (target groups) or applications on the same server. Contents Setup and push image to ECR VPC Setup CodeBuild Setup ECS Setup and Launch CodePipeline Setup Resource Cleanup "
+},
+{
+	"uri": "//localhost:1313/4-ecs/4.1-cluster/",
+	"title": "Cluster Setup",
+	"tags": [],
+	"description": "",
+	"content": "To launch ECS, we need to create a cluster to have resources for container deployment\nCreate cluster Access ECS Select Clusters -\u0026gt; Create cluster Enter Cluster name -\u0026gt; select AWS Fargate -\u0026gt; Create Cluster has been created, now we need to create task definition to create services that will run on the cluster "
+},
+{
+	"uri": "//localhost:1313/1-setupecr/",
+	"title": "Config and push image to ECR",
+	"tags": [],
+	"description": "",
+	"content": "In this section, you will create a private repository to store software image files\nCreating ECR Access ECR. In the left navigation bar, select Private repositories. Click Create repositories. Enter the repository name. It\u0026rsquo;s recommended to use the same name as the tag used when building docker for better management, then click create. If you have never used AWS CLI before, from this step we will guide you through installing and creating an IAM user for CLI. Download AWS CLI from the following link AWS CLI and install as normal Create a user to log in to CLI. Within the scope of this workshop, we will only add basic permissions to push images to ECR. Access IAM Select User =\u0026gt; create user Enter the username. Select Attach policies directly =\u0026gt; search for and select AmazonEC2ContainerRegistryPowerUser =\u0026gt; next Click create. The new account will be created immediately, access the account details =\u0026gt; create access key. We will be using this in the CLI scope so select CLI =\u0026gt; check agree =\u0026gt; next We will skip this step to create the access key directly The access key has been created successfully. You should download it as a CSV file to be able to view it more easily as it can only be viewed and downloaded once. Then access the cmd and type aws configure and log in using the key downloaded in the previous step along with the region. Now we can use AWS\u0026rsquo;s built-in commands in the IDE After performing the available steps, the built image will appear on ECR "
+},
+{
+	"uri": "//localhost:1313/4-ecs/4.3-service/",
+	"title": "Service Setup",
+	"tags": [],
+	"description": "",
+	"content": "To launch ECS, we need to create a cluster to have resources for container deployment\nCreate service Access cluster in ECS, select Service and Create On the create service page: Select task definition, the latest version of task df will be automatically selected. In environment, we\u0026rsquo;ll select launch type with fargate and the latest platform version. Desired tasks will be selected based on needs. The number of tasks will be launched based on preset parameters. Choose the same VPC as selected in task definition. Select appropriate subnets (here we choose 2 public subnets) Select the security group created in Page 2 Since our project uses Load balancing, we\u0026rsquo;ll check to use with port 80 and HTTP method Name the load balancer and target group, then review and select Create Access load balancer to get DNS access. when accessing the page, we can see the IP address of the running container. After reloading the page, it will change to a new IP address from another container You can adjust the load balancing algorithm in Edit target group attributes in the created target group. Enable stickiness to link and maintain sessions between client and container\n"
+},
+{
+	"uri": "//localhost:1313/4-ecs/4.2-taskdf/",
+	"title": "Task Definition Setup",
+	"tags": [],
+	"description": "",
+	"content": "In this step, we will create a task definition for the cluster we just created.\nCreate Task definition Access Task definition -\u0026gt; Create new task definition On the Create bucket page\nEnter Task definition name. Select Launch type, here we choose fargate. Operating system, CPU, RAM should be chosen based on application requirements. For Task roles, select existing roles or create new ones in that section. In the container section, configure as follows\nEnter container name. For Image URI, enter the exact URI with image tag. You can also access ECR -\u0026gt; Required Repository -\u0026gt; Copy URI with the tag we need. Open port for container, in our code we use port 3005 so we\u0026rsquo;ll set port 3005 For resource limits, we\u0026rsquo;ll use defaults. You can adjust CPU and RAM max/min limits according to your needs For container environment variables, we recommend using Secrets manager. Select create to complete the setup After setup, it will display task definition details with active status indicating completion and we can move to the next step. "
+},
+{
+	"uri": "//localhost:1313/2-vpc/",
+	"title": "VPC Configuration",
+	"tags": [],
+	"description": "",
+	"content": "In this section, you will set up VPC and security groups for the clusters\nVPC Setup Access VPC. Select Create VPC. Choose VPC and more to set up subnets simultaneously Enter the required information in sections 2 and 3, select the number of AZs needed. In this workshop, we will use ALB so we need to select 2 or more AZs Choose the number of Public subnets and Private Subnets. Then click create to complete the VPC setup After setup, go to VPC -\u0026gt; select the subnet you will use Choose actions -\u0026gt; Edit subnet settings Check Enable auto-assign public ipv4 address and save. Continue doing this with other subnets you will use "
+},
+{
+	"uri": "//localhost:1313/3-codebuild/",
+	"title": "CodeBuild Setup",
+	"tags": [],
+	"description": "",
+	"content": "\u0026quot;\nIn this section, you will set up CodeBuild to run dockerfile and store them on ECR\nYou will need to add buildspec.yaml for CodeBuild to work as intended. Reference buildspec file\nCreate CodeBuild Access CodeBuild Select Create project Enter the project name, select default as the project type. In the Source section: CodeBuild will be triggered through GitHub repo push command, so we will select the source directly from our GitHub. For environment settings, we will leave them as default. Then create a new service role and choose to use buildspec.yml file. For the Artifact section, select no artifacts and fill in the group name for easier log management. Then Create build project At this point, CodeBuild setup is complete but we need to grant permissions to the newly created service role so CodeBuild has permission to push images to ECR Access the service role from the CodeBuild details page On the role details page, select Add permissions -\u0026gt; Attach policies Search for EC2Container, here we will choose the appropriate permission for this role as PowerUser. Then select Add permissions. CodeBuild is now ready to operate, you can trigger it through git push or select start build "
+},
+{
+	"uri": "//localhost:1313/4-ecs/",
+	"title": "ECS Setup",
+	"tags": [],
+	"description": "",
+	"content": "A cluster is a logical grouping of services or standalone tasks. The cluster list view provides a snapshot of the status of each of your clusters. This view displays the number of active services and the deployment status of all tasks within the cluster.\nThe Task definitions view lists each task definition family you\u0026rsquo;ve created. You can perform the following actions:\nDeploy the task definition as a service or a task.\nCreate a new revision\nIn this section, we will create ECS with serverless infrastructure (fargate) cluster and launch the application.\nContent: Cluster Setup Task Definition Setup and Creation Service Setup and Launch "
+},
+{
+	"uri": "//localhost:1313/5-portfwd/",
+	"title": "CodePipeline setup",
+	"tags": [],
+	"description": "",
+	"content": "We will configure Code Pipeline to automate the container deployment process with git push as the trigger.\nCreate CodePipeline Access Code Pipeline Select Pipeline -\u0026gt; Create Pipeline Choose build custom pipeline -\u0026gt; next Enter pipeline name, we\u0026rsquo;ll create a new role and select next For the Source, select github -\u0026gt; choose connection -\u0026gt; repository name -\u0026gt; branch. Select Webhook to trigger pipeline through push command If you haven\u0026rsquo;t set up the connection yet, you can refer to here\rFor the build section, select Other build providers -\u0026gt; AWS Codebuild -\u0026gt; select the project created on page 3 and next We\u0026rsquo;ll skip the test section For deployment, select ECS -\u0026gt; Choose cluster -\u0026gt; Service -\u0026gt; Next Review and select Create pipeline After creation, the pipeline will run and return a successful result. Launch pipeline Execute git push command or select release change to start the pipeline. Congratulations, you have completed the hands-on practice for creating a CI/CD pipeline. Remember to perform the resource cleanup step to avoid unwanted costs.\n"
+},
+{
+	"uri": "//localhost:1313/6-cleanup/",
+	"title": "Resource Cleanup",
+	"tags": [],
+	"description": "",
+	"content": "We will proceed with the following steps to delete the resources we created in this practice.\nDelete CodePipeline Access CodePipeline -\u0026gt; select the pipeline to delete -\u0026gt; choose Delete pipeline Type Delete to confirm -\u0026gt; select Delete Delete CodeBuild Access CodeBuild -\u0026gt; select project to delete -\u0026gt; Actions -\u0026gt; Delete Type Delete to confirm -\u0026gt; select Delete Delete ECS cluster Access CodeBuild -\u0026gt; select cluster -\u0026gt; Delete cluster Type Delete + project name to confirm -\u0026gt; select Delete Delete VPC Access VPC -\u0026gt; select VPC to delete -\u0026gt; Actions -\u0026gt; Delete VPC Type Delete to confirm -\u0026gt; select Delete "
+},
+{
+	"uri": "//localhost:1313/categories/",
+	"title": "Categories",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "//localhost:1313/tags/",
+	"title": "Tags",
+	"tags": [],
+	"description": "",
+	"content": ""
+}]
